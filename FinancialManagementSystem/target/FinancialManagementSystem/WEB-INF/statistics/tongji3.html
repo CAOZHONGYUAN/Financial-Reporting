@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<style type="text/css">
+	body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;font-family:"微软雅黑";}
+	</style>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=U0vjLI99HRCSaD5kkAO4RrcGf1qbNcVI
+"></script>
+<script type="text/javascript" src="../X-admin/js/echarts.js"></script>
+	<title>地图展示</title>
+</head>
+<body>
+	<div id="allmap"></div>
+</body>
+</html>
+<script type="text/javascript" src="../X-admin/js/jquery.min.js"></script>
+<script type="text/javascript">
+    var points=[];
+    console.log(points);
+    $(function () {
+        var map = new BMap.Map("allmap");    // 创建Map实例
+        map.centerAndZoom(new BMap.Point(116.404, 39.915), 11);  // 初始化地图,设置中心点坐标和地图级别
+        //添加地图类型控件
+        map.addControl(new BMap.MapTypeControl({
+            mapTypes:[
+                BMAP_NORMAL_MAP,
+                BMAP_HYBRID_MAP
+            ]}));
+        map.setCurrentCity("北京");    // 设置地图显示的城市 此项是必须设置的
+        setTimeout(function(){
+            map.panTo(new BMap.Point(104.07,30.67));   //两秒后移动到成都
+        }, 2000);
+        // 百度地图API功能
+        var myIcon = new BMap.Icon("http://lbsyun.baidu.com/jsdemo/img/fox.gif", new BMap.Size(300,157));
+        map.enableScrollWheelZoom(true);
+        $.ajax({
+            type : "GET",
+            url : "../statistics/mapdata.do",
+            dataType : "json",
+            success : function(data) {
+               for(i=0;i<data.length;i++){
+                   var start=data[i].startlocation;
+                   var end=data[i].endlocation;
+                   $.ajax({
+                       type : "GET",
+                       url : "http://api.map.baidu.com/geocoder/v2/?address="+start+"&output=json&ak=U0vjLI99HRCSaD5kkAO4RrcGf1qbNcVI",
+                       async:false,//设置同步。ajax默认异步
+                       dataType: 'jsonp',
+                       /*  jsonp:'callback',//传递给请求处理程序或页面的，用以获得jsonp回调函数名的参数名(默认为:callback)
+                         jsonpCallback:"showLocation",//自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名*/
+                       success : function(result) {
+                           console.log(result.result.location.lng,result.result.location.lat);
+                           pointA=new BMap.Point(result.result.location.lng,result.result.location.lat);
+                           pointC=new BMap.Point(104.07,30.67);
+                           points.push(pointA);
+                           var marker = new BMap.Marker(pointA,{icon:myIcon});
+                           map.addOverlay(marker);
+                           var polyline = new BMap.Polyline([pointA,pointC], {strokeColor:"red", strokeWeight:2, strokeOpacity:1});  //定义折线
+                           map.addOverlay(polyline);
+                       },
+                       error : function() {
+                           layer.msg("請求失敗");
+                       }
+                   });
+
+                   $.ajax({
+                       type : "GET",
+                       url : "http://api.map.baidu.com/geocoder/v2/?address="+end+"&output=json&ak=U0vjLI99HRCSaD5kkAO4RrcGf1qbNcVI",
+                       async:false,//设置同步。ajax默认异步
+                       dataType: 'jsonp',
+                       /* jsonp:'callback',//传递给请求处理程序或页面的，用以获得jsonp回调函数名的参数名(默认为:callback)
+                        jsonpCallback:"showLocation",//自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名*/
+                       success : function(data) {
+                           console.log(data.result.location.lng,data.result.location.lat);
+                           pointB=new BMap.Point(data.result.location.lng,data.result.location.lat);
+                           points.push(pointB);
+                           pointD=new BMap.Point(104.07,30.67);
+                           var marker = new BMap.Marker(pointB,{icon:myIcon});
+                           map.addOverlay(marker);
+                           var polyline = new BMap.Polyline([pointB,pointD], {strokeColor:"red", strokeWeight:2, strokeOpacity:1});  //定义折线
+                           map.addOverlay(polyline);
+
+                       },
+                       error : function() {
+                           layer.msg("請求失敗");
+                       }
+                   });
+               }
+            },
+            error : function() {
+                layer.msg("請求失敗");
+            }
+        });
+    });
+   /* for(j=0;j<points.length;j=j+2){
+          addline(points[j],points[j+1]);
+    }
+    function addline(pointA,pointB) {
+        var polyline = new BMap.Polyline([pointA,pointB], {strokeColor:"red", strokeWeight:2, strokeOpacity:0.5});  //定义折线
+        map.addOverlay(polyline);
+    }*/
+    /*function showLocation(startlng,startlat,endlng,endlat) {
+        var map = new BMap.Map("allmap");    // 创建Map实例
+        map.centerAndZoom(new BMap.Point(116.404, 39.915), 11);  // 初始化地图,设置中心点坐标和地图级别
+        //添加地图类型控件
+        map.addControl(new BMap.MapTypeControl({
+            mapTypes:[
+                BMAP_NORMAL_MAP,
+                BMAP_HYBRID_MAP
+            ]}));
+        map.setCurrentCity("北京");    // 设置地图显示的城市 此项是必须设置的
+        setTimeout(function(){
+            map.panTo(new BMap.Point(104.07,30.67));   //两秒后移动到成都
+        }, 2000);
+        // 百度地图API功能
+        map.enableScrollWheelZoom(true);
+        var pointA = new BMap.Point(startlng, startlat);
+        var pointB = new BMap.Point(endlng,endlat);
+        var polyline = new BMap.Polyline([pointA,pointB], {strokeColor:"red", strokeWeight:2, strokeOpacity:0.5});  //定义折线
+        map.addOverlay(polyline);
+
+    }*/
+
+//开启鼠标滚轮缩放
+</script>

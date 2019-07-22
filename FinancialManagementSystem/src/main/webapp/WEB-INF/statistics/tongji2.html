@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		 <script type="text/javascript" src="../X-admin/js/echarts.js"></script>
+        <script type="text/javascript" src="../X-admin/js/jquery.min.js"></script>
+	</head>
+	<body>
+		<div id="main" style="width: 100%;height:600px;"></div>
+	</body>
+	<script type="text/javascript">
+	        // 基于准备好的dom，初始化echarts实例
+	        var myChart = echarts.init(document.getElementById('main'));
+	
+	        // 指定图表的配置项和数据
+	        // 使用刚指定的配置项和数据显示图表。
+	        myChart.setOption({
+                title: {
+                    text: '折线图堆叠'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data:['国内差旅','员工福利','公务交通','物业管理']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['1月','2月','3月','4月','5月','6月','7月']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name:'国内差旅',
+                        type:'line',
+                        stack: '总量',
+                        data:[120, 132, 101, 134, 90, 230, 210]
+                    },
+                    {
+                        name:'员工福利',
+                        type:'line',
+                        stack: '总量',
+                        data:[220, 182, 191, 234, 290, 330, 310]
+                    },
+                    {
+                        name:'公务交通',
+                        type:'line',
+                        stack: '总量',
+                        data:[150, 232, 201, 154, 190, 330, 410]
+                    },
+                    {
+                        name:'物业管理',
+                        type:'line',
+                        stack: '总量',
+                        data:[320, 332, 301, 334, 390, 330, 320]
+                    }
+                ]
+            });
+            $.get('../statistics/billdata.do').done(function (data) {
+                // 填入数据
+                console.log(data[0][0]);
+                myChart.setOption({
+                    series: [{
+                        name:'国内差旅',
+                        type:'line',
+                        stack: '总量',
+                        data:[120, 132, 101, 134, 90, 230, 210]
+                    },
+                        {
+                            name:'员工福利',
+                            type:'line',
+                            stack: '总量',
+                            data:[220, 182, 191, 234, 290, 330, 310]
+                        },
+                        {
+                            name:'公务交通',
+                            type:'line',
+                            stack: '总量',
+                            data:[data[0][0].acount,data[0][1].acount,data[0][2].acount, data[0][3].acount, data[0][4].acount, data[0][5].acount, data[0][6].acount]
+                        },
+                        {
+                            name:'物业管理',
+                            type:'line',
+                            stack: '总量',
+                            data:[data[1][0].acount,data[1][1].acount,data[1][2].acount, data[1][3].acount, data[1][4].acount, data[1][5].acount, data[1][6].acount]
+                    }]
+                });
+            });
+	    </script>
+</html>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fms.dao.UserDao">
+
+    <select id="getTotalCount" resultType="java.lang.Integer">
+        select count(*) from user
+    </select>
+
+    <select id="findByPage" parameterType="java.lang.Integer" resultType="java.util.Map">
+      select userId,userName,phoneNum,email,role.partName,regTime from user,role where user.roleId=role.roleId limit #{pageNum},#{pageSize}
+    </select>
+
+    <delete id="deleteQuery" parameterType="java.lang.Integer">
+        delete from user where userId = #{userid}
+    </delete>
+
+    <delete id="delete" parameterType="java.lang.Integer">
+        delete from user where userId = #{userid}
+    </delete>
+
+   <select id="conditionalQuery" parameterType="java.util.List" resultType="java.util.Map">
+        select userId,userName,phoneNum,email,role.partName,regTime from user JOIN role ON user.roleId=role.roleId
+        where userName=#{username}
+    </select>
+
+    <!--登录-->
+    <select id="login" parameterType="String" resultType="com.fms.entity.User">
+        select user.*,dept.deptName from USER,dept
+        where user.deptid = dept.deptid
+        And userName = #{username}
+    </select>
+
+    <!--查询收款人信息-->
+    <select id="getUserBytrueName" parameterType="String" resultType="com.fms.entity.User">
+        select user.*,dept.deptName from USER,dept
+        where user.deptid = dept.deptid
+        And trueName = #{username}
+    </select>
+
+    <!--个人信息-->
+
+    <select id="getUserInfo" resultType="com.fms.entity.UserInfo" parameterType="java.lang.Integer">
+    SELECT username,phoneNum,age,sex,idCard,bankCode,deptName,email
+FROM USER,dept WHERE user.`deptId`=dept.`deptId` AND user.userId=#{userId}
+</select>
+
+    <update id="UpdateUserInfo" parameterType="java.util.Map">
+       UPDATE USER SET username=#{userinfo.username},
+        phonenum=#{userinfo.phonenum},age=#{userinfo.age},sex=#{userinfo.sex},
+        deptid=#{userinfo.deptname},bankcode=#{userinfo.bankcode},email=#{userinfo.email}
+        WHERE userid=#{userId};
+    </update>
+
+    <select id="getpassword" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select userPass from user where userId=#{userId}
+    </select>
+
+    <update id="UpdatePass" parameterType="java.util.Map">
+        update user set userPass=#{newpass} where userId=#{userId}
+    </update>
+
+    <update id="SaveImg" parameterType="java.util.Map">
+    update userimg set src=#{src} where userid=#{userId}
+   </update>
+
+    <select id="getUserImg" parameterType="java.lang.Integer" resultType="java.lang.String">
+    select src from userimg where userId=#{userId}
+    </select>
+
+    <select id="selectTruenameById" resultType="String" parameterType="int">
+        select trueName from user where userId = #{id}
+    </select>
+    <select id="selectDeptNameByUserid" resultType="String">
+      select deptName
+      from dept where deptId = (
+        select deptId from user
+        where userId = #{userId}
+      )
+    </select>
+    <select id="selectPhonenumByUserid" resultType="String">
+        select phoneNum from user where userId = #{userId}
+    </select>
+    <select id="selectBankcodeByUserid" resultType="String">
+        select bankCode from user where userId = #{userId}
+    </select>
+</mapper>

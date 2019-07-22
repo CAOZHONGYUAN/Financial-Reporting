@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link rel="stylesheet" href="../X-admin/lib/layui/css/layui.css" media="all">
+		<script type="text/javascript" src="../X-admin/lib/layui/layui.js" charset="utf-8"></script>
+			<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<script type="text/javascript" src="../X-admin/js/jquery.min.js"></script>
+			<link rel="stylesheet" href="../X-admin/css/font.css">
+		<link rel="stylesheet" href="../X-admin/css/xadmin.css">
+		<script type="text/javascript" src="../X-admin/js/xadmin.js"></script>
+		<script type="text/javascript" src="../X-admin/js/cookie.js"></script>
+	</head>
+	<style>
+		.d01{
+			width: 100%;
+			height: 700px;
+			margin: 0 auto;
+			
+		}
+		#touxiang{
+			height: 100px;
+			width: 100px;
+			margin: 0 auto;
+		}
+		#info{
+			width: 30%;
+			height: 500px;
+			margin: 0 auto;
+			margin-top:30px;
+		}
+	</style>
+	<body>
+		<div class="d01">
+			<h2>个人信息主页</h2><hr class="layui-bg-red">
+			<div id="touxiang"><a href="#" onclick="x_admin_show('修改头像','../admin/userimg.do')"><img id="userimg" src="../X-admin/images/touxiang2.jpg" style="width: 100px;height: 100px;margin: 0 auto;"/></a></div>
+			<div id="info">
+			
+				<table class="layui-table">
+					<colgroup>
+						    <col width="200">
+                <col width="250">
+					 </colgroup>
+					<tbody id="tbody">
+						<tr>
+							<td><i class="layui-icon layui-icon-user" style="font-size: 30px; color: #1E9FFF;"></i><span>姓名：</span></td>
+							<td id="username"></td>
+						</tr>
+						<tr>
+							<td><i class="layui-icon layui-icon-cellphone" style="font-size: 30px; color: #1E9FFF;"></i><span>联系方式：</span></td>
+							<td id="phonenum"></td>
+						</tr>
+						<tr>
+							<td><i class="layui-icon layui-icon-survey" style="font-size: 30px; color: #1E9FFF;"></i><span>年龄：</span></td>
+							<td id="age"></td>
+						</tr>
+						<tr>
+							<td><i class="layui-icon layui-icon-male" style="font-size: 30px; color: #1E9FFF;"></i><span>性别：</span></td>
+							<td id="sex"></td>
+						</tr>
+						<tr>
+							<td><i class="layui-icon layui-icon-tabs" style="font-size: 30px; color: #1E9FFF;"></i><span>身份证号码：</span></td>
+							<td id="idcard"></td>
+						</tr>
+						<tr>
+							<td><i class="layui-icon layui-icon-rmb" style="font-size: 30px; color: #1E9FFF;"></i><span>银行卡号：</span></td>
+							<td id="bankcode"></td>
+						</tr>
+						<tr>
+							<td><i class="layui-icon layui-icon-home" style="font-size: 30px; color: #1E9FFF;"></i><span>部门：</span></td>
+							<td id="deptname"></td>
+						</tr>
+						<tr>
+							<td><i class="layui-icon layui-icon-website" style="font-size: 30px; color: #1E9FFF;"></i><span>邮箱：</span></td>
+							<td id="email"></td>
+						</tr>
+						<tr>
+							<td colspan="2" align="center">
+								<button class="layui-btn layui-btn-sm" id="btn_update" onclick="x_admin_show('修改个人信息','../admin/updateuserinfo.do')">修改信息</button>
+					      <button class="layui-btn layui-btn-sm">返回</button></td>
+						</tr>
+					</tbody>
+					
+				</table>
+				
+				</div>
+			</div>
+	</body>
+	<script>
+//一般直接写在一个js文件中
+layui.use(['layer', 'form'], function(){
+  var layer = layui.layer
+  ,form = layui.form;
+  
+  layer.msg('Hello World');
+});
+</script>
+</html>
+<script type="text/javascript">
+$(function () {
+    $.ajax({
+        type:"GET",
+        url:"../admin/getuserimg.do",
+        dataType:"text",
+        success:function (data) {
+            console.log(data);
+           $("#userimg").attr("src","/upload/"+data);
+        },
+        error:function () {
+            layer.msg("請求失敗");
+        }
+    });
+    $.ajax({
+        type:"GET",
+        url:"../admin/userinfodata.do",
+        dataType:"json",
+        success:function (data) {
+            console.log(data);
+            $("#username").html(data.username);
+            $("#phonenum").html(data.phonenum);
+            $("#age").html(data.age);
+            $("#sex").html(data.sex);
+            $("#idcard").html(data.idcard);
+            $("#bankcode").html(data.bankcode);
+            $("#deptname").html(data.deptname);
+            $("#email").html(data.email);
+        },
+        error:function () {
+            layer.msg("請求失敗");
+        }
+    });
+});
+</script>

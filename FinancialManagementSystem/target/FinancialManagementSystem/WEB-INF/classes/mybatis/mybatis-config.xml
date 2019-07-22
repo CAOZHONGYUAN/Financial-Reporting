@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <typeAliases>
+        <package name="com.fms.entity"></package>
+    </typeAliases>
+
+    <mappers>
+        <mapper resource="mybatis/mapper/BillMapper.xml"></mapper>
+        <mapper resource="mybatis/mapper/PropertyMapper.xml"></mapper>
+        <mapper resource="mybatis/mapper/StatisticsMapper.xml"></mapper>
+        <mapper resource="mybatis/mapper/TrafficMapper.xml"></mapper>
+        <mapper resource="mybatis/mapper/TravelMapper.xml"></mapper>
+        <mapper resource="mybatis/mapper/UserMapper.xml"></mapper>
+        <mapper resource="mybatis/mapper/WelfareMapper.xml"></mapper>
+        <mapper resource="mybatis/mapper/DeptMapper.xml"></mapper>
+    </mappers>
+
+</configuration>

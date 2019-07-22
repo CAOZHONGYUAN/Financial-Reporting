@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fms.dao.TravelDao">
+
+    <insert id="insert" parameterType="com.fms.entity.Travel">
+        insert into travel (startDatetime, endDatetime, startlocation, endlocation,transportation, foodCost, trafficCost, accomCost, otherCost, billId,invoice)
+        values (#{startdatetime}, #{enddatetime}, #{startlocation}, #{endlocation}, #{transportation}, #{foodcost}, #{trafficcost}, #{accomcost}, #{othercost}, #{billid},#{invoice})
+    </insert>
+
+    <!--修改账单-->
+    <update id="update" parameterType="com.fms.entity.Travel">
+        update travel set startDatetime=#{startdatetime},endDatetime=#{enddatetime},
+        startlocation=#{startlocation},endlocation=#{endlocation},transportation=#{transportation},
+        countUser=#{countuser},foodCost=#{foodcost},trafficCost=#{trafficcost},
+        accomCost=#{accomcost},otherCost=#{othercost}
+        WHERE billId=#{billid}
+    </update>
+    <select id="selectAll" resultType="Map">
+        select * from travel
+        <where>billId=#{billId}</where>
+    </select>
+</mapper>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fms.dao.BillDao">
+
+  <!--历史账单Sql语句-->
+  <select id="getorderHistory" resultType="java.util.Map">
+      SELECT billId,trueName,typeName,countCost,submitDatetime,statusName FROM
+      type JOIN bill ON type.typeId=bill.typeId JOIN status ON status.statusId=bill.statusId JOIN user ON user.userId=bill.reportUserId
+      where status.statusId=4 and userId=#{param3} limit #{param1},#{param2}
+  </select>
+
+  <select id="getTotalCount" resultType="java.lang.Integer">
+    SELECT count(*) FROM
+    type JOIN bill ON type.typeId=bill.typeId JOIN status ON status.statusId=bill.statusId JOIN user ON user.userId=bill.reportUserId
+    where status.statusId=4
+  </select>
+
+    <select id="getOrderHistoryQuery" parameterType="java.util.Map" resultType="java.util.Map">
+      SELECT billId,trueName,typeName,countCost,submitDatetime,statusName FROM
+      type JOIN bill ON type.typeId=bill.typeId JOIN status ON status.statusId=bill.statusId JOIN user ON user.userId=bill.reportUserId
+      where status.statusId=4 and typeName=#{typeName}
+    </select>
+
+  <!--已办账单Sql语句-->
+  <select id="getOrderWait" resultType="java.util.Map">
+      SELECT billId,trueName,typeName,countCost,submitDatetime,statusName FROM
+      type JOIN bill ON type.typeId=bill.typeId JOIN status ON status.statusId=bill.statusId JOIN user ON user.userId=bill.reportUserId
+      where status.statusId between 1 and 3 and userId=#{param3} limit #{param1},#{param2}
+  </select>
+
+  <select id="getTotalWaitCount" resultType="java.lang.Integer">
+    SELECT count(*) FROM
+    type JOIN bill ON type.typeId=bill.typeId JOIN status ON status.statusId=bill.statusId JOIN user ON user.userId=bill.reportUserId
+    where status.statusId between 1 and 3
+  </select>
+
+  <select id="getOrderWaitQuery" parameterType="java.util.Map" resultType="java.util.Map">
+      SELECT billId,trueName,typeName,countCost,submitDatetime,statusName FROM
+      type JOIN bill ON type.typeId=bill.typeId JOIN status ON status.statusId=bill.statusId JOIN user ON user.userId=bill.reportUserId
+      where status.statusId between 1 and 3 and typeName=#{typeName}
+    </select>
+
+  <!--我的待办Sql语句-->
+  <select id="getOrderError" resultType="java.util.Map">
+      SELECT billId,trueName,typeName,countCost,submitDatetime,statusName FROM
+      type JOIN bill ON type.typeId=bill.typeId JOIN status ON status.statusId=bill.statusId JOIN user ON user.userId=bill.reportUserId
+      where status.statusId between -1 and 0 and userId=#{param3} limit #{param1},#{param2}
+  </select>
+
+  <select id="getTotalErrorCount" resultType="java.lang.Integer">
+    SELECT count(*) FROM
+    type JOIN bill ON type.typeId=bill.typeId JOIN status ON status.statusId=bill.statusId JOIN user ON user.userId=bill.reportUserId
+    where status.statusId between -1 and 0
+  </select>
+
+  <select id="getOrderErrorQuery" parameterType="java.util.Map" resultType="java.util.Map">
+      SELECT billId,trueName,typeName,countCost,submitDatetime,statusName FROM
+      type JOIN bill ON type.typeId=bill.typeId JOIN status ON status.statusId=bill.statusId JOIN user ON user.userId=bill.reportUserId
+       where status.statusId BETWEEN -1 and 0  and typeName=#{typeName} and userId=#{userId}
+    </select>
+
+  <!--根据billId删除对应表信息-->
+  <delete id="deleteProperty" parameterType="java.lang.String">
+      delete from property where billId=#{billId}
+  </delete>
+  <delete id="deleteTraffic" parameterType="java.lang.String">
+      delete from traffic where billId=#{billId}
+  </delete>
+  <delete id="deleteTravel" parameterType="java.lang.String">
+      delete from travel where billId=#{billId}
+  </delete>
+  <delete id="deleteWelfare" parameterType="java.lang.String">
+      delete from welfare where billId=#{billId}
+  </delete>
+  <delete id="deleteBill" parameterType="java.lang.String">
+      delete from bill where billId=#{billId}
+  </delete>
+<!--基本账单插入-->
+    <insert id="insert" parameterType="com.fms.entity.Bill">
+    insert into bill(billId,reportUserId,submitDatetime,description,statusId,typeId,countCost)
+    values (#{billid},#{reportuserid},sysdate(),#{description},#{statusid},#{typeid},#{countcost})
+  </insert>
+    <!--渲染我的待办编辑页面-->
+    <!--国内差旅-->
+    <select id="getEdit1" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT u.trueName,u.userId,d.deptName,u.phoneNum,typeName,b.billId,b.description,t.*
+        FROM user u,dept d,type,bill b,travel t
+        where u.deptId=d.deptId
+        and u.userId=b.reportUserId
+        and b.typeId=type.typeId
+        and b.billId=t.billId
+        and b.billId=#{billId}
+    </select>
+    <!--员工福利-->
+    <select id="getEdit2" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT u2.trueName trueName2,u2.bankCode bankCode2,u1.trueName trueName1,u1.userId,d.deptName,u1.phoneNum,typeName,b.billId,b.description,w.useFor,w.depict,w.cost
+        FROM user u1,user u2,dept d,type,bill b,welfare w
+        where u1.deptId=d.deptId
+        and u1.userId=b.reportUserId
+        and u2.userId = w.payeeUserId
+        and b.typeId=type.typeId
+        and b.billId=w.billId
+        and b.billId=#{billid}
+    </select>
+    <!--公务交通-->
+    <select id="getEdit3" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT u.trueName,u.userId,d.deptName,u.phoneNum,typeName,b.billId,b.description,t.useFor,t.depict,u.bankCode,t.cost
+        FROM user u,dept d,type,bill b,traffic t
+        where u.deptId=d.deptId
+        and u.userId=b.reportUserId
+        and b.typeId=type.typeId
+        and b.billId=t.billId
+        and b.billId=#{billId}
+    </select>
+    <!--物业管理-->
+    <select id="getEdit4" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT u.trueName,u.userId,d.deptName,u.phoneNum,typeName,b.billId,b.description,p.useFor,p.depict,u.bankCode,p.cost
+        FROM user u,dept d,type,bill b,property p
+        where u.deptId=d.deptId
+        and u.userId=b.reportUserId
+        and b.typeId=type.typeId
+        and b.billId=p.billId
+        and b.billId=#{billId}
+    </select>
+
+    <!--修改账单-->
+    <update id="update" parameterType="com.fms.entity.Bill">
+        update bill set description=#{description} WHERE billId=#{billid}
+    </update>
+    <!--查询-->
+    <select id="countPagenumByStatusAndDeptno" resultType="Integer">
+        select count(*) from bill
+        <where>statusId=#{0}
+            <if test="param2!=null">
+                and reportUserId in (select userId from user where deptId = #{1})
+            </if>
+            <if test="param3!=null">
+                and submitDatetime &gt;= #{2}
+            </if>
+            <if test="param4!=null">
+                and submitDatetime &lt;= #{3}
+            </if>
+            <if test="param5!=null">
+                and billId like #{4}
+            </if>
+        </where>
+    </select>
+    <select id="selectByStatusAndDeptno" resultType="Map" >
+    select billId,reportUserId,submitDatetime,statusId,typeId,description from bill
+    <where>statusId=#{statusId}
+        <if test="deptno!=null">
+            and reportUserId in (select userId from user where deptId = #{deptno})
+        </if>
+        <if test="startDate!=null">
+            and submitDatetime &gt;= #{startDate}
+        </if>
+        <if test="endDate!=null">
+            and submitDatetime &lt;= #{endDate}
+        </if>
+        <if test="strBillId!=null">
+            and billId like #{strBillId}
+        </if>
+    </where>
+    order by submitDatetime desc
+    limit #{start},#{size}
+    </select>
+    <!--计算账单金额-->
+    <select id="countAllCost" resultType="Double" >
+        <if test="param2==1">
+            select sum(ifnull(foodCost,0)+ifnull(trafficCost,0)+ifnull(accomCost,0)+ifnull(otherCost,0))
+            from travel
+            where billId=#{param1}
+        </if>
+        <if test="param2==2">
+            select ifnull(cost,0)
+            from welfare
+            where billId=#{param1}
+        </if>
+        <if test="param2==3">
+            select ifnull(cost,0)
+            from traffic
+            where billId=#{param1}
+        </if>
+        <if test="param2==4">
+            select ifnull(cost,0)
+            from property
+            where billId=#{param1}
+        </if>
+    </select>
+    <select id="selectStatusById" resultType="Integer">
+        select statusId from bill where billId = #{billId}
+    </select>
+
+    <update id="updateBillStatus">
+      update bill set statusId = #{statusId}, remarks = #{remarks}
+      where billId = #{billId}
+    </update>
+</mapper>
